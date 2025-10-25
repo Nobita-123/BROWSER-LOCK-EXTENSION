@@ -1,0 +1,29 @@
+{
+  "name": "Browser Lock",
+  "short_name": "Browser Lock",
+  "version": "1.0.1",
+  "description": "Locks Your Browser With a Password so that no one can access it except you.",
+  "manifest_version": 3,
+  "background": {
+    "service_worker": "background.js"
+  },
+  "options_page": "options/index.html",
+  "permissions": [
+    "storage",
+    "windows",
+    "tabs",
+    "idle",
+    "alarms"
+  ],
+  "action": {
+    "default_title": "Browser Lock",
+    "default_icon": "icons/Browserlocker.png",
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "128": "icons/128.png",
+    "64": "icons/64.png",
+    "48": "icons/48.png",
+    "16": "icons/16.png"
+  }
+}

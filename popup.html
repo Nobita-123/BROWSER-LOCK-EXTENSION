@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Browser Lock</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="popup-container">
+        <span class="app-brand">Browser Lock</span>
+        <h3>Lock Status</h3>
+
+        <div class="toggle-group">
+            <span class="toggle-label">Enable Blocking</span>
+            <label class="switch">
+                <input type="checkbox" id="blockingToggle" checked>
+                <span class="slider round"></span>
+            </label>
+        </div>
+
+        <button id="lockBrowser" class="popup-button">
+            <span class="icon icon-lock"></span>
+            Lock Browser
+        </button>
+        <button id="openOptions" class="popup-button secondary">
+            <span class="icon icon-settings"></span>
+            Options
+        </button>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>

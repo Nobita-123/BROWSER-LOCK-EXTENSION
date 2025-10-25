@@ -1,0 +1,156 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1A1A2E, #16213E, #0F3460); /* Deep, elegant gradient */
+    color: #E0E0E0; /* Light gray for text */
+    overflow: hidden;
+}
+
+.main-container {
+    perspective: 1000px; /* For subtle 3D effects if needed later */
+}
+
+.lock-card {
+    background-color: #2D3A5D; /* A slightly lighter dark blue for the card */
+    border-radius: 15px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), /* Stronger, deeper shadow */
+                0 0 0 1px rgba(255, 255, 255, 0.05); /* Subtle white border for depth */
+    text-align: center;
+    width: 380px;
+    max-width: 90vw;
+    animation: fadeInScale 0.5s ease-out forwards;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.lock-icon {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3)); /* Add shadow to icon */
+}
+
+h1 {
+    font-size: 2.2em;
+    color: #FFFFFF; /* Pure white for main heading */
+    margin-bottom: 30px;
+    letter-spacing: 0.5px;
+}
+
+input[type="password"] {
+    width: calc(100% - 40px);
+    padding: 15px 20px;
+    margin-bottom: 25px;
+    border: none;
+    border-radius: 8px;
+    background-color: #1F2841; /* Darker input background */
+    color: #FFFFFF;
+    font-size: 1.1em;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input[type="password"]::placeholder {
+    color: #90A4AE; /* Lighter placeholder text */
+}
+
+input[type="password"]:focus {
+    outline: none;
+    background-color: #28334E;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.4), 0 0 0 2px #4CAF50; /* Green focus highlight */
+}
+
+#unlockButton {
+    width: calc(100% - 40px);
+    padding: 15px 20px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(45deg, #6C5CE7, #8A2BE2); /* Elegant purple gradient */
+    color: #FFFFFF;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+#unlockButton:hover {
+    background: linear-gradient(45deg, #7B68EE, #9932CC); /* Slightly brighter on hover */
+    transform: translateY(-2px);
+    box-shadow: 0 7px 20px rgba(0, 0, 0, 0.4);
+}
+
+#unlockButton:active {
+    transform: translateY(0);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.forgot-password {
+    display: block;
+    margin-top: 20px;
+    color: #9BB8D0; /* A soft blue for the link */
+    text-decoration: none;
+    font-size: 0.95em;
+    transition: color 0.3s ease;
+}
+
+.forgot-password:hover {
+    color: #AADCF8; /* Lighter blue on hover */
+    text-decoration: underline;
+}
+
+/* Message Box Styling */
+.message-box {
+    margin-top: 20px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.3s ease-out, background-color 0.3s ease-out;
+}
+
+.message-box.show {
+    opacity: 1;
+}
+
+.message-box.error {
+    background-color: #FF6B6B33; /* Soft red with transparency */
+    color: #FF6B6B;
+    border: 1px solid #FF6B6B;
+}
+
+.message-box.success {
+    background-color: #4CAF5033; /* Soft green with transparency */
+    color: #4CAF50;
+    border: 1px solid #4CAF50;
+}
+
+/* Responsive adjustments */
+@media (max-width: 500px) {
+    .lock-card {
+        padding: 30px;
+        width: 85vw;
+    }
+    h1 {
+        font-size: 1.8em;
+    }
+    input[type="password"], #unlockButton {
+        width: 100%;
+        padding: 12px 15px;
+    }
+}
