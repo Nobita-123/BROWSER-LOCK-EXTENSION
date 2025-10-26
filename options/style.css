@@ -1,0 +1,279 @@
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Align to top, not center, for options page */
+    min-height: 100vh;
+    background-color: #1a1a1a; /* Dark background */
+    color: #e0e0e0; /* Light text */
+    padding: 40px 20px; /* Padding around the content */
+    box-sizing: border-box;
+}
+
+.options-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 800px; /* Max width for the entire options content */
+}
+
+.app-brand {
+    font-size: 14px;
+    font-weight: normal;
+    color: #a0a0a0;
+    margin-bottom: 30px;
+    align-self: flex-start; /* Align to the left of the entire container */
+    padding-left: 20px; /* Adjust as needed */
+}
+
+.card {
+    background-color: #242424; /* Slightly lighter dark background for the card */
+    padding: 40px 60px; /* Generous padding inside the card */
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    width: 100%;
+    max-width: 700px; /* Max width for the card itself */
+    box-sizing: border-box;
+    text-align: left; /* Align text within the card to the left */
+}
+
+.card-title {
+    font-size: 32px;
+    font-weight: 600;
+    color: #f0f0f0;
+    margin-bottom: 30px;
+    text-align: center; /* Center the main title */
+}
+
+/* --- Animated Status Message --- */
+.status-message {
+    background-color: #3a3a3a;
+    color: #ffffff;
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    font-size: 15px;
+    text-align: center;
+    border: 1px solid #555;
+    
+    /* Animation */
+    opacity: 0;
+    transform: translateY(-10px);
+    visibility: hidden;
+    height: 0;
+    overflow: hidden;
+    transition: all 0.4s ease;
+}
+.status-message.success { background-color: #28a745; border-color: #218838; } /* Green for success */
+.status-message.error { background-color: #dc3545; border-color: #c82333; }   /* Red for error */
+
+/* Style for when message is shown via JS */
+.status-message[style*="block"] {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+    height: auto; /* Auto height based on content */
+}
+
+.section {
+    margin-bottom: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #3a3a3a; /* Subtle divider between sections */
+}
+.section:first-of-type {
+    border-top: none; /* No top border for the first section */
+    padding-top: 0;
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: 500;
+    color: #f0f0f0;
+    margin-bottom: 15px;
+    text-align: center; /* Center section titles */
+}
+
+.section-description {
+    font-size: 14px;
+    color: #a0a0a0;
+    text-align: center;
+    margin-bottom: 30px;
+    line-height: 1.5;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 14px;
+    color: #a0a0a0;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+input[type="password"],
+input[type="text"],
+input[type="number"] {
+    width: calc(100% - 24px); /* Full width minus padding */
+    padding: 12px 12px;
+    border: 1px solid #444;
+    border-radius: 10px;
+    background-color: #333;
+    color: #e0e0e0;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s; /* Added animation */
+}
+
+input[type="password"]:focus,
+input[type="text"]:focus,
+input[type="number"]:focus {
+    border-color: #8A2BE2; /* Use purple accent on focus */
+    box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.3); /* Subtle focus highlight */
+}
+
+input::placeholder {
+    color: #777;
+}
+
+.primary-button, .secondary-button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s; /* Added animation */
+    margin-top: 10px; /* Space above buttons */
+}
+
+.primary-button {
+    background-color: #6a6a6a; /* Dark gray */
+    color: white;
+    width: auto; /* Allow button to size naturally */
+    display: block; /* Make it a block element to control margin */
+    margin-left: auto;
+    margin-right: auto; /* Center button */
+}
+
+.primary-button:hover {
+    background-color: #8a8a8a; /* Lighter gray on hover */
+    transform: translateY(-2px); /* Add subtle lift */
+}
+
+.primary-button:active {
+    transform: translateY(0); /* Press down effect */
+}
+
+.secondary-button {
+    background-color: #444; /* Even darker gray */
+    color: #e0e0e0;
+    padding: 12px 20px; 
+}
+
+.secondary-button:hover {
+    background-color: #555;
+    transform: translateY(-2px); /* Add subtle lift */
+}
+
+.input-group.auto-lock-delay-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.input-group.auto-lock-delay-group label {
+    margin-bottom: 0; /* Align label with input */
+    flex-shrink: 0;
+}
+.input-group.auto-lock-delay-group input {
+    width: 80px; /* Smaller width for number input */
+    flex-grow: 0;
+}
+
+.divider {
+    border: none;
+    border-top: 1px solid #3a3a3a;
+    margin: 30px 0;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+    accent-color: #8A2BE2; /* Color for the checkbox itself */
+}
+
+.checkbox-group label {
+    margin-bottom: 0;
+    color: #f0f0f0;
+}
+
+.footer-links {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #3a3a3a;
+}
+
+.text-button {
+    background: none;
+    border: none;
+    color: #a0a0a0;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.text-button:hover {
+    color: #e0e0e0;
+    text-decoration: underline;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .card {
+        padding: 30px;
+    }
+    .card-title {
+        font-size: 28px;
+    }
+    .section-title {
+        font-size: 22px;
+    }
+    .primary-button, .secondary-button {
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+        margin-top: 15px;
+    }
+    .input-group.auto-lock-delay-group {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .input-group.auto-lock-delay-group label {
+        margin-bottom: 5px;
+    }
+    .input-group.auto-lock-delay-group input {
+        width: 100%;
+        max-width: 100px; /* Still keep it reasonably small */
+    }
+    
+    .input-group {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .input-group input {
+        width: calc(100% - 24px);
+    }
+}

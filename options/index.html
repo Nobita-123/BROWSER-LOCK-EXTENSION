@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Browser Lock Options</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <div class="options-container">
+        <h1 class="app-brand">App Genius X</h1>
+
+        <div class="card">
+            <h2 class="card-title">Browser Lock Options</h2>
+
+            <div id="statusMessage" class="status-message"></div>
+
+            <div class="section">
+                <h3 class="section-title">Security Settings</h3>
+                <p class="section-description">
+                    Set your password and a security question to recover your account.
+                    <br>To change just one, fill out the relevant fields and click save.
+                </p>
+                
+                <form id="securityForm">
+                    <div class="input-group">
+                        <label for="newPassword">Set/Update Password</label>
+                        <input type="password" id="newPassword" placeholder="Enter new password">
+                    </div>
+                    <div class="input-group">
+                        <label for="confirmPassword">Confirm New Password</label>
+                        <input type="password" id="confirmPassword" placeholder="Confirm new password">
+                    </div>
+
+                    <hr class="divider">
+
+                    <div class="input-group">
+                        <label for="securityQuestion">Set Security Question</label>
+                        <input type="text" id="securityQuestion" placeholder="e.g. What is your first pet's name?">
+                    </div>
+                    <div class="input-group">
+                        <label for="securityAnswer">Set Security Answer</label>
+                        <input type="text" id="securityAnswer" placeholder="Enter security answer (case-insensitive)">
+                    </div>
+                    
+                    <button id="saveSecurityBtn" class="primary-button">Save Security Settings</button>
+                </form>
+                </div>
+
+            <div class="section">
+                <h3 class="section-title">General Settings</h3>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="autoLockCheckbox">
+                    <label for="autoLockCheckbox">Enable Auto Lock (after inactivity)</label>
+                </div>
+                <div class="input-group auto-lock-delay-group">
+                    <label for="autoLockDelay">Auto Lock Delay (minutes)</label>
+                    <input type="number" id="autoLockDelay" value="5" min="1">
+                </div>
+                <button id="saveGeneralSettingsBtn" class="primary-button">Save General Settings</button>
+            </div>
+
+            <div class="footer-links">
+                <a href="#" id="resetAllData" class="text-button">Reset All Extension Data</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="options.js"></script>
+</body>
+</html>

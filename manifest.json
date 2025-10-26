@@ -25,5 +25,19 @@
     "64": "icons/64.png",
     "48": "icons/48.png",
     "16": "icons/16.png"
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "password.html",
+        "reset_password.html",
+        "style-lock.css",
+        "reset-style.css",
+        "password.js",
+        "reset_password.js",
+        "icons/Browserlocker.png"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }

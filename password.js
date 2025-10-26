@@ -1,16 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
     const passwordInput = document.getElementById('password');
-    const unlockButton = document.getElementById('unlockButton'); // Fixed: Correct ID
+    const unlockButton = document.getElementById('unlockButton');
     const messageEl = document.getElementById('message-box');
 
-    // Focus on the password input when the page loads
     passwordInput.focus();
 
     // Event listener for unlock button click
     unlockButton.addEventListener('click', async () => {
         const password = passwordInput.value;
         if (password) {
-            messageEl.classList.remove('show'); // Hide previous error
+            messageEl.classList.remove('show');
             
             // Send message to background script to unlock
             chrome.runtime.sendMessage({ action: 'unlockBrowser', password: password }, (response) => {
@@ -19,11 +18,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     showMessage("An unexpected error occurred. Please try again.", "error");
                     return;
                 }
+                
+                // --- NEW LOGIC: Handle the redirect response ---
                 if (response && response.success) {
-                    // Browser unlocked, this window will be replaced or closed by background.js
+                    // Browser unlocked! Navigate to the intended page.
+                    showMessage('Unlocked!', 'success');
+                    if (response.redirectUrl) {
+                        // Use window.location.replace to go to the new page
+                        // and prevent the lock screen from being in the browser history.
+                        window.location.replace(response.redirectUrl);
+                    } else {
+                        // Fallback just in case
+                        window.location.replace('chrome://newtab');
+                    }
                 } else {
+                    // Failed to unlock
                     showMessage(response.error || 'Incorrect Password', "error");
                 }
+                // --- End of new logic ---
             });
         } else {
             showMessage('Please enter your password.', "error");

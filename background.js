@@ -1,7 +1,5 @@
 // --- Globals ---
-let blockedHostnames = [];
 let autoLockSettings = { enabled: false, delay: 5 };
-const AUTO_LOCK_ALARM_NAME = 'browserAutoLock';
 
 // --- Utility Functions ---
 
@@ -16,12 +14,6 @@ async function hashPassword(password) {
 }
 
 // Load settings from storage into memory
-async function loadBlockedHostnames() {
-  const data = await chrome.storage.local.get({ blockedUrls: [] });
-  blockedHostnames = data.blockedUrls;
-  console.log('Browser Lock: Blocklist reloaded.', blockedHostnames);
-}
-
 async function loadAutoLockSettings() {
   const data = await chrome.storage.local.get({ autoLockEnabled: false, autoLockDelay: 5 });
   autoLockSettings = {
@@ -29,111 +21,62 @@ async function loadAutoLockSettings() {
     delay: data.autoLockDelay
   };
   console.log('Browser Lock: Auto-lock settings reloaded.', autoLockSettings);
-  // After loading, update idle listener state
   updateIdleListener();
 }
 
 // --- Blocking Logic ---
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  // 1. Check if extension is toggled on
   const storage = await chrome.storage.local.get({ isBlockingEnabled: true });
-  if (storage.isBlockingEnabled === false) {
-    return; // Do nothing if the extension is disabled
-  }
+  if (storage.isBlockingEnabled === false) return;
 
-  // 2. Check if a URL is being updated
   if (changeInfo.url) {
     const url = changeInfo.url;
 
-    // --- ENTIRE LOGIC BLOCK REPLACED ---
-
-    // A. Check for pages that must ALWAYS be allowed (the lock screen itself)
+    // A. Always allow lock/reset screen
     const passwordUrl = chrome.runtime.getURL('password.html');
     const resetUrl = chrome.runtime.getURL('reset_password.html');
     if (url.startsWith(passwordUrl) || url.startsWith(resetUrl)) {
-      return; // Always allow lock/reset screen to load
+      return;
     }
 
-    // B. Check the browser's lock state
+    // B. Check if browser is locked
     const data = await chrome.storage.local.get('isLocked');
 
     // C. If LOCKED, block *everything* else
     if (data.isLocked) {
-      // The URL is not the password page, so redirect it back to the password page.
-      // This will correctly handle 'chrome://extensions', 'google.com', etc.
       try {
+        // This is the main lock. Any tab navigation gets redirected.
         chrome.tabs.update(tabId, { url: passwordUrl });
-      } catch (e) {
-        console.warn('Failed to redirect locked tab:', e.message);
-      }
+      } catch (e) { console.warn('Failed to redirect locked tab:', e.message); }
       return;
     }
 
-    // D. If UNLOCKED, check for user-defined blocked sites (http/https only)
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      try {
-        const currentUrl = new URL(url);
-        let hostname = currentUrl.hostname;
-        if (hostname.startsWith('www.')) {
-          hostname = hostname.substring(4);
-        }
-
-        // Use the in-memory blocklist
-        if (blockedHostnames.length > 0 && blockedHostnames.includes(hostname)) {
-          try {
-            chrome.tabs.remove(tabId); // Close user-blocked sites
-          } catch (e) {
-            console.warn('Could not remove tab:', e.message);
-          }
-          return;
-        }
-      } catch (e) {
-        console.error('Error parsing URL for blocking:', url, e);
-      }
-    }
-    
-    // E. If UNLOCKED and not a user-blocked site (e.g., 'chrome://extensions'),
-    //    do nothing and allow access.
-    
-    // --- END OF REPLACED LOGIC ---
+    // D. Site-specific blocking has been removed.
   }
 });
 
 // --- Installation & Startup ---
 chrome.runtime.onInstalled.addListener(async (details) => {
-  // On first install, open options to set password
   if (details.reason === 'install') {
-    const data = await chrome.storage.local.get('passwordHash');
-    if (!data.passwordHash) {
-      chrome.runtime.openOptionsPage();
-    }
+    chrome.runtime.openOptionsPage();
   }
-  // Set defaults
   await chrome.storage.local.set({ isLocked: false, isBlockingEnabled: true });
-  // Load settings into memory
-  await loadBlockedHostnames();
+  await chrome.storage.session.set({ tempWhitelist: [] }); // Clear any old data
   await loadAutoLockSettings();
 });
 
 chrome.runtime.onStartup.addListener(async () => {
   const data = await chrome.storage.local.get('passwordHash');
   if (data.passwordHash) {
-    // Lock on startup if a password is set
     await chrome.storage.local.set({ isLocked: true });
   }
-  // Load settings into memory
-  await loadBlockedHostnames();
   await loadAutoLockSettings();
 });
 
 // --- Auto-Lock Logic ---
 function updateIdleListener() {
-  // Clear any existing listeners or alarms to prevent duplicates
   chrome.idle.onStateChanged.removeListener(onIdleStateChanged);
-  chrome.alarms.clear(AUTO_LOCK_ALARM_NAME);
-  
   if (autoLockSettings.enabled) {
-    // Set detection interval and add listener ONLY if enabled
     chrome.idle.setDetectionInterval(autoLockSettings.delay * 60);
     chrome.idle.onStateChanged.addListener(onIdleStateChanged);
   }
@@ -141,11 +84,9 @@ function updateIdleListener() {
 
 async function onIdleStateChanged(newState) {
   if (newState === 'idle') {
-    // User is idle, lock the browser.
-    // We check settings again just in case.
     const storage = await chrome.storage.local.get({ isLocked: false, passwordHash: null });
     if (!storage.isLocked && storage.passwordHash) {
-        lockBrowser(); // No sendResponse needed here
+        lockBrowser(null);
     }
   }
 }
@@ -155,7 +96,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   (async () => {
     try {
       if (request.action === 'lockBrowser') {
-        await lockBrowser(sendResponse);
+        await lockBrowser(sendResponse); // Manual lock
       } else if (request.action === 'unlockBrowser') {
         await unlockBrowser(request.password, sender.tab.id, sendResponse);
       } else if (request.action === 'getSecurityQuestion') {
@@ -163,34 +104,36 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         sendResponse({ question: data.securityQuestion });
       } else if (request.action === 'verifySecurityAnswer') {
         const data = await chrome.storage.local.get('securityAnswer');
-        // Check if securityAnswer exists before comparing
         if (data.securityAnswer && request.answer.toLowerCase() === data.securityAnswer.toLowerCase()) {
           sendResponse({ success: true });
         } else {
           sendResponse({ success: false, error: 'Incorrect answer' });
         }
-      } else if (request.action === 'setNewPassword') {
-        // Expecting a HASH from reset_password.js
-        await chrome.storage.local.set({ passwordHash: request.passwordHash });
+      } 
+      // --- Centralized Hashing ---
+      else if (request.action === 'savePassword') { // From options page
+        const hashedPassword = await hashPassword(request.password);
+        await chrome.storage.local.set({ passwordHash: hashedPassword });
+        sendResponse({ success: true });
+      } else if (request.action === 'setNewPassword') { // From reset page
+        const hashedPassword = await hashPassword(request.password);
+        await chrome.storage.local.set({ passwordHash: hashedPassword });
         sendResponse({ success: true });
       }
-      // --- Listen for updates from Options page ---
-      else if (request.action === 'updateBlockedUrls') {
-        await loadBlockedHostnames();
-        sendResponse({ success: true });
-      } else if (request.action === 'updateGeneralSettings') {
+      // --- UX Improvement ---
+      else if (request.action === 'unlockAfterReset') {
+        // This is a special unlock from the reset page.
+        await chrome.storage.local.set({ isLocked: false });
+        // Just send a simple success, password.js will handle redirect.
+        sendResponse({ success: true, redirectUrl: "chrome://newtab" });
+      }
+      // --- Settings Updates ---
+      else if (request.action === 'updateGeneralSettings') {
         await loadAutoLockSettings();
         sendResponse({ success: true });
       } else if (request.action === 'resetAllData') {
-        await loadBlockedHostnames(); // Will load empty array
-        await loadAutoLockSettings(); // Will load defaults
-        sendResponse({ success: true });
-      }
-      else if (request.action === 'toggleBlocking') {
-        // State is already set in storage by popup.js. This just confirms receipt.
-        sendResponse({ success: true });
-      } else if (request.action === 'passwordUpdated') {
-        // Password hash is read from storage on-demand, no in-memory state to update.
+        await loadAutoLockSettings(); 
+        await chrome.storage.session.set({ tempWhitelist: [] });
         sendResponse({ success: true });
       }
     } catch (error) {
@@ -201,13 +144,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   return true; // Indicates async response
 });
 
-// --- Core Functions ---
+
+// --- CORE FUNCTIONS (CHANGED) ---
+
 async function lockBrowser(sendResponse) {
   try {
     const storage = await chrome.storage.local.get(['passwordHash', 'isBlockingEnabled']);
     
     if (storage.isBlockingEnabled === false) {
-      console.log('Cannot lock, extension is disabled.');
       if (sendResponse) sendResponse({ success: false, error: 'Extension is disabled.' });
       return;
     }
@@ -218,38 +162,27 @@ async function lockBrowser(sendResponse) {
       return;
     }
 
-    // Save all tabs (FILTERED)
-    const passwordUrl = chrome.runtime.getURL('password.html');
-    const resetUrl = chrome.runtime.getURL('reset_password.html');
-    
-    const allTabs = await chrome.tabs.query({});
-    const tabsToSave = allTabs.filter(tab => 
-        !tab.url.startsWith(passwordUrl) && 
-        !tab.url.startsWith(resetUrl) &&
-        !tab.url.startsWith('chrome-extension://')
-    );
-
-    const openTabs = tabsToSave.map((tab) => ({
-      url: tab.url,
-      windowId: tab.windowId,
-    }));
-    await chrome.storage.local.set({ openTabs: JSON.stringify(openTabs) });
+    // Clear any session data
+    await chrome.storage.session.set({ tempWhitelist: [] });
 
     // Set lock state
     await chrome.storage.local.set({ isLocked: true });
 
-    // Close all tabs
-    // Use the 'allTabs' list we already queried
-    for (const tab of allTabs) { 
-      try {
-        await chrome.tabs.remove(tab.id);
-      } catch (e) {
-        console.warn(`Could not close tab ${tab.id}: ${e.message}`);
+    // --- NEW LOGIC: Redirect all tabs instead of closing ---
+    const passwordUrl = chrome.runtime.getURL('password.html');
+    const allTabs = await chrome.tabs.query({ status: 'complete' });
+    
+    for (const tab of allTabs) {
+      // Don't redirect tabs that are already on the lock page or special pages
+      if (tab.url && !tab.url.startsWith(passwordUrl) && tab.url.startsWith('http')) {
+        try {
+          await chrome.tabs.update(tab.id, { url: passwordUrl });
+        } catch (e) {
+          console.warn(`Could not update tab ${tab.id}: ${e.message}`);
+        }
       }
     }
-
-    // Open the password page in a new window
-    chrome.windows.create({ url: 'password.html' });
+    // --- End of new logic ---
 
     if (sendResponse) sendResponse({ success: true });
 
@@ -263,64 +196,25 @@ async function unlockBrowser(password, senderTabId, sendResponse) {
   try {
     const data = await chrome.storage.local.get('passwordHash');
     const storedPasswordHash = data.passwordHash;
-    
-    // Hash the provided password to compare
     const hashedPassword = await hashPassword(password);
 
     if (hashedPassword === storedPasswordHash) {
       await chrome.storage.local.set({ isLocked: false });
-      await restoreOpenTabs(sendResponse, senderTabId);
+
+      // --- NEW LOGIC: Send default redirect URL ---
+      const redirectUrl = "chrome://newtab"; // Default redirect
+      
+      // Clear the whitelist now that we're unlocked
+      await chrome.storage.session.set({ tempWhitelist: [] });
+
+      sendResponse({ success: true, redirectUrl: redirectUrl });
+      // --- End of new logic ---
+
     } else {
       sendResponse({ success: false, error: 'Incorrect Password' });
     }
   } catch (error) {
     console.error('Error in unlockBrowser:', error);
-    sendResponse({ success: false, error: error.message });
-  }
-}
-
-async function restoreOpenTabs(sendResponse, senderTabId) {
-  try {
-    const data = await chrome.storage.local.get('openTabs');
-    const openTabs = JSON.parse(data.openTabs || '[]');
-
-    if (openTabs.length > 0) {
-      const windowTabsMap = openTabs.reduce((acc, tab) => {
-        if (!acc[tab.windowId]) acc[tab.windowId] = [];
-        // Filter out blank tabs or internal extension pages
-        if (tab.url && !tab.url.startsWith('chrome://newtab') && !tab.url.startsWith('chrome-extension://')) {
-          acc[tab.windowId].push(tab.url);
-        }
-        return acc;
-      }, {});
-
-      for (const windowId of Object.keys(windowTabsMap)) {
-        const urlsToOpen = windowTabsMap[windowId];
-        if (urlsToOpen.length > 0) {
-          await chrome.windows.create({ url: urlsToOpen });
-        } else {
-          await chrome.windows.create({}); // Create empty window
-        }
-      }
-    } else {
-      await chrome.windows.create({}); // Create a single empty window
-    }
-    
-    await chrome.storage.local.remove('openTabs');
-    sendResponse({ success: true });
-
-    // After success, close the password tab that sent the message
-    if (senderTabId) {
-        try {
-            await chrome.tabs.remove(senderTabId);
-        } catch (e) {
-            console.warn(`Could not close password tab ${senderTabId}: ${e.message}`);
-        }
-    }
-
-  } catch (error)
- {
-    console.error('Error in restoreOpenTabs:', error);
     sendResponse({ success: false, error: error.message });
   }
 }

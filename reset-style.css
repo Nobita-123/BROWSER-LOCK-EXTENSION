@@ -36,55 +36,15 @@
     box-sizing: border-box;
 }
 
+/* Use base input styles from style-lock.css */
 #step-answer input[type="text"],
 #step-password input[type="password"] {
     width: calc(100% - 40px);
-    padding: 15px 20px;
-    margin-bottom: 25px;
-    border: none;
-    border-radius: 8px;
-    background-color: #1F2841;
-    color: #FFFFFF;
-    font-size: 1.1em;
-    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-#step-answer input[type="text"]::placeholder,
-#step-password input[type="password"]::placeholder {
-    color: #90A4AE;
-}
-
-#step-answer input[type="text"]:focus,
-#step-password input[type="password"]:focus {
-    outline: none;
-    background-color: #28334E;
-    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.4), 0 0 0 2px #4CAF50;
-}
-
+/* Use base button styles from style-lock.css */
 .action-button {
     width: calc(100% - 40px);
-    padding: 15px 20px;
-    border: none;
-    border-radius: 8px;
-    background: linear-gradient(45deg, #6C5CE7, #8A2BE2); /* Consistent purple gradient */
-    color: #FFFFFF;
-    font-size: 1.2em;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-}
-
-.action-button:hover {
-    background: linear-gradient(45deg, #7B68EE, #9932CC);
-    transform: translateY(-2px);
-    box-shadow: 0 7px 20px rgba(0, 0, 0, 0.4);
-}
-
-.action-button:active {
-    transform: translateY(0);
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
 }
 
 .action-button:disabled {

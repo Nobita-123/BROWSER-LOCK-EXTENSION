@@ -1,85 +1,83 @@
+/* Base styles for lock and reset pages */
 body {
     margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: linear-gradient(135deg, #1A1A2E, #16213E, #0F3460); /* Deep, elegant gradient */
-    color: #E0E0E0; /* Light gray for text */
-    overflow: hidden;
+    background-color: #1a1a1a; /* Dark background */
+    color: #e0e0e0;
 }
 
 .main-container {
-    perspective: 1000px; /* For subtle 3D effects if needed later */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 .lock-card {
-    background-color: #2D3A5D; /* A slightly lighter dark blue for the card */
-    border-radius: 15px;
-    padding: 40px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), /* Stronger, deeper shadow */
-                0 0 0 1px rgba(255, 255, 255, 0.05); /* Subtle white border for depth */
+    background-color: #242424;
+    padding: 40px 50px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
-    width: 380px;
-    max-width: 90vw;
-    animation: fadeInScale 0.5s ease-out forwards;
-}
-
-@keyframes fadeInScale {
-    from {
-        opacity: 0;
-        transform: scale(0.9);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
 }
 
 .lock-icon {
     width: 80px;
     height: 80px;
     margin-bottom: 20px;
-    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3)); /* Add shadow to icon */
 }
 
 h1 {
     font-size: 2.2em;
-    color: #FFFFFF; /* Pure white for main heading */
-    margin-bottom: 30px;
-    letter-spacing: 0.5px;
+    font-weight: 600;
+    color: #f0f0f0;
+    margin: 0 0 30px 0;
 }
 
-input[type="password"] {
+input[type="password"],
+input[type="text"] {
     width: calc(100% - 40px);
     padding: 15px 20px;
     margin-bottom: 25px;
     border: none;
     border-radius: 8px;
-    background-color: #1F2841; /* Darker input background */
+    background-color: #1F2841;
     color: #FFFFFF;
     font-size: 1.1em;
     box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-input[type="password"]::placeholder {
-    color: #90A4AE; /* Lighter placeholder text */
+input[type="password"]::placeholder,
+input[type="text"]::placeholder {
+    color: #90A4AE;
 }
 
-input[type="password"]:focus {
+input[type="password"]:focus,
+input[type="text"]:focus {
     outline: none;
     background-color: #28334E;
-    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.4), 0 0 0 2px #4CAF50; /* Green focus highlight */
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.4), 0 0 0 2px #4CAF50; /* Green focus */
 }
 
-#unlockButton {
-    width: calc(100% - 40px);
+button {
+    width: 100%;
     padding: 15px 20px;
     border: none;
     border-radius: 8px;
-    background: linear-gradient(45deg, #6C5CE7, #8A2BE2); /* Elegant purple gradient */
+    background: linear-gradient(45deg, #6C5CE7, #8A2BE2); /* Purple gradient */
     color: #FFFFFF;
     font-size: 1.2em;
     font-weight: bold;
@@ -88,69 +86,78 @@ input[type="password"]:focus {
     transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
 }
 
-#unlockButton:hover {
-    background: linear-gradient(45deg, #7B68EE, #9932CC); /* Slightly brighter on hover */
+button:hover {
+    background: linear-gradient(45deg, #7B68EE, #9932CC);
     transform: translateY(-2px);
     box-shadow: 0 7px 20px rgba(0, 0, 0, 0.4);
 }
 
-#unlockButton:active {
+button:active {
     transform: translateY(0);
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
 }
 
 .forgot-password {
-    display: block;
-    margin-top: 20px;
-    color: #9BB8D0; /* A soft blue for the link */
+    display: inline-block;
+    margin-top: 25px;
+    color: #a0a0a0;
+    font-size: 0.9em;
     text-decoration: none;
-    font-size: 0.95em;
     transition: color 0.3s ease;
 }
 
 .forgot-password:hover {
-    color: #AADCF8; /* Lighter blue on hover */
+    color: #e0e0e0;
     text-decoration: underline;
 }
 
-/* Message Box Styling */
+/* --- Animated Message Box --- */
 .message-box {
+    width: calc(100% - 40px);
+    padding: 15px 20px;
     margin-top: 20px;
-    padding: 10px 20px;
     border-radius: 8px;
     font-size: 1em;
-    font-weight: bold;
+    font-weight: 500;
+    color: #FFFFFF;
+    background-color: #3a3a3a;
+    border: 1px solid #555;
+    box-sizing: border-box;
+    
+    /* Animation */
     opacity: 0;
-    transition: opacity 0.3s ease-out, background-color 0.3s ease-out;
+    transform: translateY(10px);
+    visibility: hidden;
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
 }
 
 .message-box.show {
     opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
 }
 
-.message-box.error {
-    background-color: #FF6B6B33; /* Soft red with transparency */
-    color: #FF6B6B;
-    border: 1px solid #FF6B6B;
+.message-box.success { 
+    background-color: #28a745; 
+    border-color: #218838; 
+}
+.message-box.error { 
+    background-color: #dc3545; 
+    border-color: #c82333; 
 }
 
-.message-box.success {
-    background-color: #4CAF5033; /* Soft green with transparency */
-    color: #4CAF50;
-    border: 1px solid #4CAF50;
-}
-
-/* Responsive adjustments */
+/* Responsive */
 @media (max-width: 500px) {
     .lock-card {
-        padding: 30px;
-        width: 85vw;
+        padding: 30px 25px;
     }
     h1 {
         font-size: 1.8em;
     }
-    input[type="password"], #unlockButton {
+    input[type="password"],
+    input[type="text"],
+    button,
+    .message-box {
         width: 100%;
-        padding: 12px 15px;
     }
 }
